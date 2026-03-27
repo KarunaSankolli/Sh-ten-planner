@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日常手帳 — Techo Planner</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Noto+Sans+JP:wght@300;400;500&family=IM+Fell+English:ital@0;1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-text">Techo</span>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" id="nav-today" onclick="switchView('today')"><span>Today</span></button>
+                <button class="nav-btn" id="nav-weekly" onclick="switchView('weekly')"><span>This Week</span></button>
+                <button class="nav-btn" id="nav-consume" onclick="switchView('consume')"><span>Consume</span></button>
+                <button class="nav-btn" id="nav-journal" onclick="switchView('journal')"><span>Past
+                        Journal</span></button>
+            </nav>
+            <div class="mini-calendar">
+                <div class="cal-top-header">
+                    <div>
+                        <div class="cal-big-date" id="cal-big-date">28</div>
+                        <div class="cal-month-label" id="cal-month-label">December</div>
+                    </div>
+                    <div class="cal-icon-btn">
+                        <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+                        <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+                    </div>
+                </div>
+
+                <div class="cal-days-header">
+                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                </div>
+                <div class="cal-grid" id="cal-grid"></div>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="moon-display"><span class="moon-emoji" id="moon-emoji"></span><span class="moon-label"
+                        id="moon-label"></span></div>
+                <button class="login-btn" id="login-btn" onclick="openModal('login-modal')"><span
+                        id="login-label">Login</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- TODAY VIEW -->
+            <section class="view active" id="view-today">
+                <div class="movie-banner">
+                    <div class="movie-scene-wrap">
+                        <div class="movie-scene-emoji" id="movie-scene-emoji">🌿</div>
+                    </div>
+                    <div class="movie-quote-area">
+                        <div class="quote-mark">&ldquo;</div>
+                        <p class="movie-quote" id="movie-quote"></p>
+                        <p class="movie-source" id="movie-source"></p>
+                    </div>
+                    <div class="banner-date">
+                        <div class="date-day" id="date-day"></div>
+                        <div class="date-full" id="date-full"></div>
+                        <div class="date-reiwa" id="date-reiwa"></div>
+                        <div class="date-time" id="date-time"></div>
+                    </div>
+                </div>
+                <div class="today-grid">
+                    <div class="today-left">
+                        <div class="tasks-row">
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <h2 class="section-title">Top 3 Priorities</h2><button class="add-btn"
+                                        onclick="openAddTask('daily')" title="Add task (⌘K)">＋</button>
+                                </div>
+                                <p class="section-hint">Your most important tasks for today</p>
+                                <ul class="task-list" id="daily-priority-list"></ul>
+                                <div style="border-top:1px dashed var(--grid);margin:10px 0 6px;opacity:.5"></div>
+                                <div
+                                    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                                    <span style="font-size:.8rem;opacity:.6;font-family:'Noto Sans JP',sans-serif">Other
+                                        Tasks</span>
+                                </div>
+                                <ul class="task-list" id="daily-other-list"></ul>
+                            </div>
+                            <div class="section-card" id="tomorrow-card">
+                                <div class="section-header">
+                                    <h2 class="section-title">Tomorrow's
+                                        Tasks</h2><button class="add-btn" onclick="openAddTask('tomorrow')"
+                                        title="Plan tomorrow">＋</button>
+                                </div>
+                                <p class="section-hint">Drag tasks here to move them →</p>
+                                <ul class="task-list" id="tomorrow-task-list"></ul>
+                            </div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <h2 class="section-title">Daily Habits</h2><button class="add-btn"
+                                    onclick="openAddHabit()" title="Add habit">＋</button>
+                            </div>
+                            <p class="section-hint">Check off your habits to build a streak!</p>
+                            <div id="daily-habits-list"
+                                style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;"></div>
+                        </div>
+                    </div>
+                    <div class="today-right">
+                        <div class="section-card hourly-card">
+                            <div class="section-header">
+                                <h2 class="section-title">Hourly
+                                    Mapping</h2>
+                                <div class="date-nav" style="gap:4px">
+                                    <button class="date-nav-btn" onclick="changeViewDate(-1)">‹</button>
+                                    <button class="date-nav-btn" onclick="changeViewDate(1)">›</button>
+                                </div>
+                                <button class="today-jump-btn" onclick="goToToday()">Today</button>
+                            </div>
+                            <div class="timeline" id="timeline"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WEEKLY LEARNINGS VIEW -->
+            <section class="view" id="view-weekly">
+                <div class="view-header-bar">
+                    <button class="week-nav-btn" onclick="changeWeek(-1)">‹ Prev</button>
+                    <h2 class="view-title" id="weekly-title">This Week</h2>
+                    <div id="weekly-habit-stickers" class="weekly-habit-stickers"></div>
+                    <button class="week-nav-btn" onclick="changeWeek(1)">Next ›</button>
+                </div>
+                <div class="weekly-grid" id="weekly-grid"></div>
+            </section>
+
+            <!-- JOURNAL VIEW -->
+            <section class="view" id="view-journal">
+                <div class="view-header-bar">
+                    <h2 class="view-title">Past Journal <span class="section-kanji"
+                            style="font-size:.75rem;vertical-align:middle">記録</span></h2>
+                </div>
+                <div class="journal-list" id="journal-list"></div>
+            </section>
+
+            <!-- CONSUME VIEW -->
+            <section class="view" id="view-consume">
+                <button class="toggle-select-btn" id="toggle-select-btn" onclick="toggleSelectionMode()">
+                    <span>Multi-select</span>
+                </button>
+                <button class="toggle-library-btn" onclick="toggleLibrary()">
+                    <span>Library</span>
+                    <span class="lib-count" id="lib-count">0</span>
+                </button>
+                <div class="consume-canvas" id="consume-canvas">
+                    <div class="consume-canvas-inner" id="consume-canvas-inner">
+                        <div class="consume-empty-hint">
+                            <div class="hint-icon">📋</div>
+                            <h3>Paste links to capture</h3>
+                            <p>Command + V to paste YouTube, X, or any article</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="consume-toolbar" class="consume-toolbar">
+                    <div class="toolbar-count">0 Selected</div>
+                    <div class="toolbar-actions">
+                        <button class="toolbar-btn primary" onclick="copyForNotebookLM()" title="Copy all selected URLs">
+                            <span>📋</span> Copy for NotebookLM
+                        </button>
+                        <button class="toolbar-btn" onclick="bulkMoveToLibrary()" title="Move selected to Library">
+                            <span>✓</span> Mark Done
+                        </button>
+                        <button class="toolbar-btn" onclick="bulkRemoveConsumeItems()" title="Delete selected">
+                            <span>✕</span> Remove
+                        </button>
+                        <button class="toolbar-btn" onclick="clearConsumeSelection()" title="Clear selection">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+                <div class="consume-library-panel" id="consume-library-panel">
+                    <div class="library-header">
+                        <h3>Library</h3>
+                        <button class="close-library" onclick="toggleLibrary()">✕</button>
+                    </div>
+                    <div class="library-list" id="consume-library-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="task-modal" onclick="closeModal('task-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-task-heading">Add Task</h3><button class="modal-close"
+                    onclick="closeModal('task-modal')">✕</button>
+            </div>
+            <input type="text" class="modal-input" id="task-name-input" placeholder="Task name…" />
+            <div class="modal-row"><label class="modal-label">Time</label><input type="time" class="modal-input"
+                    id="task-time-input" /></div>
+            <div class="modal-row"><label class="modal-label">Tag</label>
+                <select class="modal-input" id="task-tag-input">
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="health">Health</option>
+                    <option value="creative">Creative</option>
+                </select>
+            </div>
+            <div class="modal-row"><label class="modal-label">Priority</label>
+                <select class="modal-input" id="task-priority-input">
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('task-modal')">Cancel</button><button class="btn-primary"
+                    onclick="saveTask()">Save</button></div>
+            <div id="delete-task-row" style="display:none;margin-top:10px;text-align:center"><button class="btn-danger"
+                    onclick="deleteCurrentTask()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="focus-modal" onclick="closeModal('focus-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header"><span class="modal-kanji">週</span>
+                <h3>Weekly Focus</h3><button class="modal-close" onclick="closeModal('focus-modal')">✕</button>
+            </div>
+            <textarea class="modal-input" id="focus-input" rows="3" placeholder="Set your weekly intention…"></textarea>
+            <div class="modal-actions"><button class="btn-secondary"
+                    onclick="closeModal('focus-modal')">Cancel</button><button class="btn-primary"
+                    onclick="saveWeeklyFocus()">Save</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="habit-modal" onclick="closeModal('habit-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Add Habit</h3><button class="modal-close"
+                    onclick="closeModal('habit-modal')">✕</button>
+            </div>
+            <input type="text" class="modal-input" id="habit-name-input" placeholder="Habit name (e.g., Read 10 min)…" />
+            
+            <div class="habit-sticker-selector-container">
+                <div class="modal-label" style="font-size: 0.75rem; color: var(--ink3); margin: 12px 0 6px 0;">Choose a Sticker</div>
+                <div class="habit-sticker-grid" id="habit-sticker-grid">
+                    <!-- Stickers will be generated by JS -->
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 16px;"><button class="btn-secondary"
+                    onclick="closeModal('habit-modal')">Cancel</button><button class="btn-primary"
+                    onclick="saveHabit()">Save</button></div>
+            <div id="delete-habit-row" style="display:none;margin-top:10px;text-align:center"><button class="btn-danger"
+                    onclick="deleteHabit()">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="login-modal" onclick="closeModal('login-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header"><span class="modal-kanji">人</span>
+                <h3>Welcome</h3><button class="modal-close" onclick="closeModal('login-modal')">✕</button>
+            </div>
+            <input type="text" class="modal-input" id="login-name" placeholder="Your name…" />
+            <div class="modal-actions"><button class="btn-primary" onclick="saveLogin()">Enter</button></div>
+        </div>
+    </div>
+
+
+    <script src="app.js"></script>
+</body>
+
+</html>
